@@ -11,6 +11,7 @@ unit Compiler;
 
   uses
     PathUtils;
+    StringUtils;
 
   function CompileCD(const Line: string): string;
   var
@@ -20,12 +21,26 @@ unit Compiler;
     Result := Copy(Line, SplitLoc, MaxInt);
   end;
 
-  function CompileEcho(const Line: string): string;
+  function CompileEcho(Line: string): string;
   var
     SplitLoc: Integer;
   begin
-    //TODO: handle arguments
-    Result := 'echo ' + Copy(Line, 5, MaxInt); //split after 'echo '
+    //handle escape charachters
+    if Pos(' -e ', Line) > 0 then //no new line after echo
+    begin
+      //uses user input but sending nul for input value to get no newline
+      Result := '<nul set /p="' + Copy(Line, 5, MaxInt) + '"';  
+    end
+
+    if Pos(' -n ', Line) > 0 then //no new line after echo
+    begin
+      //uses user input but sending nul for input value to get no newline
+      Result := '<nul set /p="' + Copy(Line, 5, MaxInt) + '"';  
+    end
+    else
+    begin
+      Result := 'echo ' + Copy(Line, 5, MaxInt); //split after 'echo '
+    end;
   end;
 
   function CompileExit(const Line: string): string;
