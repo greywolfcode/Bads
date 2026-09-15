@@ -3,15 +3,17 @@ unit ArrayList;
   interface
 
   type
-    ArrayList = class(TObject);
+    DynamicIntArr = array of Integer;
+
+    ArrayListInt = class(TObject)
     private
-      Max: Integer;
+      FMax: Integer;
       FLength: Integer;
-      Data: array of Integer; //Only stores integers for now
+      Data: DynamicIntArr; //Only stores integers for now
     public
       constructor Create; overload;
       constructor Create(NumItems: Integer); overload;
-      constructor Create(Items: array of Integer); overload;
+      constructor Create(Items: DynamicIntArr); overload;
 
       property Length: Integer read FLength;
 
@@ -27,38 +29,38 @@ unit ArrayList;
     Result := ((Num + 3) div 4) * 4;
   end;
 
-  constructor ArrayList.Create
+  constructor ArrayListInt.Create;
   begin
     inherited Create;
-    Max := 0;
-    SetLength(Data, Max);
-    Length = 0;
+    FMax := 0;
+    SetLength(Data, FMax);
+    FLength := 0;
   end;
 
-  constructor ArrayList.Create(NumItems: Integer);
+  constructor ArrayListInt.Create(NumItems: Integer);
   begin
     inherited Create;
-    Max := ClosestMultipleOfFour(NumItems); //array resizes in increments of 4
-    SetLength(Data, Max);
+    FMax := Arraylist.ClosestMultipleOfFour(NumItems); //array resizes in increments of 4
+    SetLength(Data, FMax);
   end;
 
-  constructor ArrayList.Create(Items: array of Integer);
+  constructor ArrayListInt.Create(Items: DynamicIntArr);
   begin
     inherited Create;
     Data := Items;
-    Max := ClosestMultipleOfFour(Length(Data)); //array resizes in increments of 4
-    SetLength(Data, Max);
-    Length = Length(Items); //number of actual items stored
+    FMax := ClosestMultipleOfFour(System.Length(Data)); //array resizes in increments of 4
+    SetLength(Data, FMax);
+    FLength := System.Length(Items); //number of actual items stored
   end;
 
-  procedure ArrayList.Add(Item: Integer);
+  procedure ArrayListInt.Add(Item: Integer);
   begin
-      if Length = Max then //increase array size
+      if Length = FMax then //increase array size
       begin
-        Inc(Max, 4);
-        SetLength(Data, Max);
+        Inc(FMax, 4);
+        SetLength(Data, FMax);
       end;
-      Inc(Length);
+      Inc(FLength);
       Data[Length] := Item;
   end;
 
@@ -74,23 +76,23 @@ unit ArrayList;
     end;
   end;
 
-  function ArrayList.Pop(Index: Integer): Integer;
+  function ArrayListInt.Pop(Index: Integer): Integer;
   var
     I: Integer;
   begin
-    Result := Data[Index]
-    Dec(Length);
+    Result := Data[Index];
+    Dec(FLength);
 
     //Shift all indicies over
-    for I to Length - 2 do
+    for I := 1 to FLength - 2 do
     begin
-      Data[I] = Data[I + 1];
-    end
+      Data[I] := Data[I + 1];
+    end;
 
-    if Length < (Max - 4) then; //decrease array size if requried
+    if FLength < (FMax - 4) then; //decrease array size if requried
     begin
-      Dec(Max, 4);
-      SetLength(Data, Max);
+      Dec(FMax, 4);
+      SetLength(Data, FMax);
     end;
   end;
 end.
