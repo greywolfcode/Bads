@@ -26,10 +26,10 @@ unit Compiler;
     SplitLoc: Integer;
   begin
     //handle escape charachters
+    // -E for print escape codes is default on dos
     if Pos(' -e ', Line) > 0 then //no new line after echo
     begin
-      //uses user input but sending nul for input value to get no newline
-      Result := '<nul set /p="' + Copy(Line, 5, MaxInt) + '"';  
+      Line := ConvertEscapeCodes(Line);
     end;
     if Pos(' -n ', Line) > 0 then //no new line after echo
     begin
