@@ -36,7 +36,8 @@ unit TokenData;
       TAssignment,
       TDollar,
 
-      //Commands/Vars/Numbers
+      //Commands/Vars/Numbers/Data
+      TString,
       TWord
     );
 

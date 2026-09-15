@@ -88,6 +88,17 @@ unit Lexer;
         //assignment/variables
         '=': AddToken(Output, '=', LineNum, TAssignment);
         '$': AddToken(Output, '$', LineNum, TDollar);
+
+        //data
+        #39: begin //single quote '
+               while (Offset + 1 <= Length(Line))
+                and (not (Line[Offset + 1] = #39)) do
+               begin
+                 Inc(Offset);
+               end;
+               Lexeme := Copy(Line, Start, Offset);
+               AddToken(Output, Lexeme, LineNum, TString);
+             end;
       else
         if IsAlphaNumeric(CurrentToken) then
         begin
@@ -124,16 +135,4 @@ unit Lexer;
           begin
             AddToken(Output, 'while', LineNum, TWhile);
           end
-          else if Lexeme = 'until' then
-          begin
-            AddToken(Output, 'until', LineNum, TUntil);
-          end
-          else if Lexeme = 'do' then
-          begin
-            AddToken(Output, 'do', LineNum, TDo);
-          end
-          else if Lexeme = 'done' then
-          begin
-            AddToken(Output, 'done', LineNum, TDone);
-          end
-          else if 
+          else if Lexeme = 'u
