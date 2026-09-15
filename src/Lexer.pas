@@ -100,38 +100,34 @@ unit Lexer;
                AddToken(Output, Lexeme, LineNum, TString);
              end;
         '"': begin
+               Lexeme := '';
                while (Offset + 1 <= Length(Line))
-                and (not (Line[Offset + 1] = #39)) do
+                and (not (Line[Offset + 1] = '"')) do
                begin
+                 if Line[Offset + 1] = '\' then
+                 begin
+                   if Line[Offset + 2] in ['"', '$', '\'] then
+                   begin
+                     Inc(Offset); //increment twice to get charachter after slash
+                     Lexeme := Lexeme + Line[Offset + 2];
+                   end
+                   else
+                   begin
+                     Lexeme := Lexeme + Line[Offset + 2];
+                   end;
+                 end
+                 else
+                 begin
+                   Lexeme := Lexeme + Line[Offset + 1];
+                 end;
                  Inc(Offset);
                end;
-               Lexeme := Copy(Line, Start, Offset);
                AddToken(Output, Lexeme, LineNum, TWeakString);
              end;
       else
         if IsAlphaNumeric(CurrentToken) then
         begin
+          Lexeme := '';
           while (Offset + 1 <= Length(Line))
                 and (IsAlphaNumeric(Line[Offset + 1]))
-                or (Line[Offset + 1] = '_') do
-          begin
-            Inc(Offset);
-          end;
-
-          Lexeme := Copy(Line, Start, Offset);
-          //check for keyword
-          if Lexeme = 'if' then
-          begin
-            AddToken(Output, 'if', LineNum, TIf);
-          end
-          else if Lexeme = 'then' then
-          begin
-            AddToken(Output, 'then', LineNum, TThen);
-          end
-          else if Lexeme = 'elif' then
-          begin
-            AddToken(Output, 'elif', LineNum, TElif);
-          end
-          else if Lexeme = 'else' then
-          begin
-            Ad
+              
