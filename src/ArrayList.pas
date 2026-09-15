@@ -18,6 +18,7 @@ unit ArrayList;
       property Length: Integer read FLength;
 
       procedure Add(Item: Integer);
+      function Get(Index: Integer): Integer;
       function Pop: Integer; overload;
       function Pop(Index: Integer): Integer; overload;
     end;
@@ -64,15 +65,20 @@ unit ArrayList;
       Data[Length] := Item;
   end;
 
-  function ArrayList.Pop: Integer;
+  function ArraylistInt.Get(Index: Integer): Integer;
   begin
-    Result := Data[Length]
-    Dec(Length);
+    Result := Data[Index];
+  end;
 
-    if Length < (Max - 4) then; //decrease array size if requried
+  function ArrayListInt.Pop: Integer;
+  begin
+    Result := Data[Length];
+    Dec(FLength);
+
+    if Length < (FMax - 4) then; //decrease array size if requried
     begin
-      Dec(Max, 4);
-      SetLength(Data, Max);
+      Dec(FMax, 4);
+      SetLength(Data, FMax);
     end;
   end;
 
