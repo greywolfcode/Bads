@@ -38,6 +38,7 @@ unit TokenData;
 
       //Commands/Vars/Numbers/Data
       TString,
+      TWeakString,
       TWord
     );
 

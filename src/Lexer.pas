@@ -99,6 +99,15 @@ unit Lexer;
                Lexeme := Copy(Line, Start, Offset);
                AddToken(Output, Lexeme, LineNum, TString);
              end;
+        '"': begin
+               while (Offset + 1 <= Length(Line))
+                and (not (Line[Offset + 1] = #39)) do
+               begin
+                 Inc(Offset);
+               end;
+               Lexeme := Copy(Line, Start, Offset);
+               AddToken(Output, Lexeme, LineNum, TWeakString);
+             end;
       else
         if IsAlphaNumeric(CurrentToken) then
         begin
@@ -125,14 +134,4 @@ unit Lexer;
           end
           else if Lexeme = 'else' then
           begin
-            AddToken(Output, 'else', LineNum, TElse);
-          end
-          else if Lexeme = 'fi' then
-          begin
-            AddToken(Output, 'fi', LineNum, TFi);
-          end
-          else if Lexeme = 'while' then
-          begin
-            AddToken(Output, 'while', LineNum, TWhile);
-          end
-          else if Lexeme = 'u
+            Ad
