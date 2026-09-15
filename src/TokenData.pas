@@ -8,6 +8,10 @@ unit TokenData;
       TSemicolon,
       TAnd,
       TOr,
+      TLeftParen,
+      TRightParen,
+      TLeftCurlyBracket,
+      TRightCurlyBracket,
 
       //Redirection
       TRedirectInput,
@@ -32,13 +36,13 @@ unit TokenData;
       TAssignment,
       TExtract,
       TPosition,
-      TEvalMath,
+      TEvalMath
     );
 
     Token = record
-      Lexeme: string,
-      Line: Integer,
-      LexemeType: TokenType,
+      Lexeme: string;
+      Line: Integer;
+      LexemeType: TokenType;
     end;
 
     TTokenArray = array of Token;
