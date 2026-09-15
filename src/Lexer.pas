@@ -4,6 +4,7 @@ unit Lexer;
 
   uses
     SysUtils,
+    StringUtils,
     TokenData;
 
   function ParseFile(Path: string): TTokenArray;
@@ -28,6 +29,7 @@ unit Lexer;
     Start: Integer;
     Offset: Integer;
     CurrentToken: Char;
+    Lexeme: string;
   begin
     Start := 1;
     Offset := 1;
@@ -46,44 +48,92 @@ unit Lexer;
         ')': AddToken(Output, ')', LineNum, TRightParen);
         '{': AddToken(Output, '{', LineNum, TLeftCurlyBracket);
         '}': AddToken(Output, '}', LineNum, TRightCurlyBracket);
+        '|': begin
+               if (Offset + 1 > Length(Line))
+                   or (not (Line[Offset + 1] = '|')) then
+               begin
+                 AddToken(Output, '|', LineNum, TPipe);
+               end
+               else
+               begin
+                 AddToken(Output, '||', LineNum, TOr);
+               end;
+             end;
+        '&': begin
+               if (Offset + 1 > Length(Line))
+                   or (not (Line[Offset + 1] = '&')) then
+               begin
+                 
+               end
+               else
+               begin
+                 AddToken(Output, '&&', LineNum, TAnd);
+               end;
+             end;
 
         //redirection
-        '>': AddToken(Output, '>', LineNum, TRedirectOutput);
+        '<': AddToken(Output, '<', LineNum, TRedirectInput);
+        '>': begin
+               if (Offset + 1 > Length(Line))
+                   or (not (Line[Offset + 1] = '>')) then
+               begin
+                 AddToken(Output, '>', LineNum, TRedirectOutput);
+               end
+               else
+               begin
+                 AddToken(Output, '>>', LineNum, TRedirectOutputAppend);
+               end;
+             end;
 
         //assignment/variables
         '=': AddToken(Output, '=', LineNum, TAssignment);
+        '$': AddToken(Output, '$', LineNum, TDollar);
       else
-        
-      end;
-      
-    end;
-  end;
+        if IsAlphaNumeric(CurrentToken) then
+        begin
+          while (Offset + 1 <= Length(Line))
+                and (IsAlphaNumeric(Line[Offset + 1]))
+                or (Line[Offset + 1] = '_') do
+          begin
+            Inc(Offset);
+          end;
 
-  function ParseFile(Path: string): TTokenArray;
-  var
-    FileData: TextFile;
-    Line: string;
-    Output: TTokenArray;
-  begin
-    if not FileExists(Path) then
-    begin
-      writeln('Error: File "', Path, '" does not exist');
-      Halt(2); //DOS exit code for File not found
-    end;
-
-    AssignFile(FileData, Path);
-    Reset(FileData);
-
-    try
-      while not Eof(FileData) do
-      begin
-        readln(FileData, Line);
-      end;
-    finally
-      CloseFile(FileData);
-    end;
-
-    Result := Output;
-  end;
-
-end.
+          Lexeme := Copy(Line, Start, Offset);
+          //check for keyword
+          if Lexeme = 'if' then
+          begin
+            AddToken(Output, 'if', LineNum, TIf);
+          end
+          else if Lexeme = 'then' then
+          begin
+            AddToken(Output, 'then', LineNum, TThen);
+          end
+          else if Lexeme = 'elif' then
+          begin
+            AddToken(Output, 'elif', LineNum, TElif);
+          end
+          else if Lexeme = 'else' then
+          begin
+            AddToken(Output, 'else', LineNum, TElse);
+          end
+          else if Lexeme = 'fi' then
+          begin
+            AddToken(Output, 'fi', LineNum, TFi);
+          end
+          else if Lexeme = 'while' then
+          begin
+            AddToken(Output, 'while', LineNum, TWhile);
+          end
+          else if Lexeme = 'until' then
+          begin
+            AddToken(Output, 'until', LineNum, TUntil);
+          end
+          else if Lexeme = 'do' then
+          begin
+            AddToken(Output, 'do', LineNum, TDo);
+          end
+          else if Lexeme = 'done' then
+          begin
+            AddToken(Output, 'done', LineNum, TDone);
+          end
+          else if 
