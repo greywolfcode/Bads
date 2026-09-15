@@ -34,9 +34,10 @@ unit TokenData;
 
       //Assignemnt/Variables
       TAssignment,
-      TExtract,
-      TPosition,
-      TEvalMath
+      TDollar,
+
+      //Commands/Vars/Numbers
+      TWord
     );
 
     Token = record
