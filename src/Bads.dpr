@@ -3,7 +3,9 @@ program Bads;
 uses
   SysUtils,
   Output,
-  Compiler;
+  Compiler,
+  Lexer,
+  TokenData;
 
 var
   i: Integer;
