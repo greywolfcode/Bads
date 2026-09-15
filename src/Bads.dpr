@@ -22,7 +22,7 @@ begin
     if (ParamCount < 3) then
     begin
       writeln('Invalid Arguments');
-      Halt (3);
+      Halt(3);
     end;
 
     Compile(ParamStr(2), ParamStr(3));

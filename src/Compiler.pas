@@ -10,7 +10,7 @@ unit Compiler;
   implementation
 
   uses
-    PathUtils;
+    PathUtils,
     StringUtils;
 
   function CompileCD(const Line: string): string;
@@ -30,12 +30,11 @@ unit Compiler;
     begin
       //uses user input but sending nul for input value to get no newline
       Result := '<nul set /p="' + Copy(Line, 5, MaxInt) + '"';  
-    end
-
+    end;
     if Pos(' -n ', Line) > 0 then //no new line after echo
     begin
       //uses user input but sending nul for input value to get no newline
-      Result := '<nul set /p="' + Copy(Line, 5, MaxInt) + '"';  
+      Result := '<nul set /p="' + Copy(Line, 5, MaxInt) + '"';
     end
     else
     begin
