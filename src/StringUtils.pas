@@ -7,11 +7,17 @@ unit StringUtils;
     Math;
 
   function ConvertEscapeCodes(Line: string): string;
+  function IsAlphaNumeric(C: Char): Boolean;
 
   implementation
 
   uses
     ArrayList;
+
+  function IsAlphaNumeric(C: Char): Boolean;
+  begin
+    Result := C in ['a'..'z', 'A'..'Z', '0'..'9'];  
+  end;
 
   function GetOctalCode(Nums: string): string;
   var
