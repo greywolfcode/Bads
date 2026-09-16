@@ -11,7 +11,7 @@ unit Output;
     writeln('Bash As Dos Shell');
     writeln('');
     writeln('USAGE:');
-    writeln('  bads compile <input_file> <output_folder>');
+    writeln('  bads compile <input_file> [output_folder]');
     writeln('  bads <input_file>');
     writeln('');
     writeln('COMMANDS:');
