@@ -12,6 +12,7 @@ unit TokenData;
       TRightParen,
       TLeftCurlyBracket,
       TRightCurlyBracket,
+      TEOL,
 
       //Redirection
       TRedirectInput,
