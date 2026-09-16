@@ -19,7 +19,7 @@ unit Compiler;
     Tokens: TTokenArray;
   begin
     Tokens := ParseFile(FileName);
-    Transpile(Tokens);
+    Transpile(Tokens, FileName, OutputPath);
   end;
   
 end.
