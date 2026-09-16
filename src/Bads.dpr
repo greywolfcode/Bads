@@ -1,4 +1,5 @@
 program Bads;
+{$R *.res}
 {$APPTYPE CONSOLE}
 uses
   SysUtils,
