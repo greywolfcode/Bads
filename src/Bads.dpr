@@ -3,13 +3,7 @@ program Bads;
 uses
   SysUtils,
   Output,
-  Compiler,
-  Lexer,
-  TokenData;
-
-var
-  i: Integer;
-  arg: String;
+  Compiler;
 
 begin
 
