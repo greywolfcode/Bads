@@ -8,6 +8,7 @@ unit StringUtils;
 
   function ConvertEscapeCodes(Line: string): string;
   function IsAlphaNumeric(C: Char): Boolean;
+  function IsWhitespace(C: Char): Boolean;
 
   implementation
 
@@ -17,6 +18,12 @@ unit StringUtils;
   function IsAlphaNumeric(C: Char): Boolean;
   begin
     Result := C in ['a'..'z', 'A'..'Z', '0'..'9'];  
+  end;
+
+  function IsWhitespace(C: Char): Boolean;
+  begin
+    //              ' '  \t  \n   \v   \f   \r
+    Result := C in [' ', #9, #10, #11, #12, #13];  
   end;
 
   function GetOctalCode(Nums: string): string;
@@ -88,29 +95,30 @@ unit StringUtils;
           continue;
         end;
 
-        EscapeChar := Line[I + 1]; //I is location of \
+        EscapeChar := Line[Loc + 1]; //Loc is location of \
         if EscapeChar = '0' then //octal char
         begin
-          if I < Length(Line) - 4 then
+          if Loc < Length(Line) - 4 then
           begin
             CodeLength := 4;
-            NewChars := GetOctalCode(Copy(Line, I+1, I+4));
+            NewChars := GetOctalCode(Copy(Line, Loc+1, Loc+4));
           end;
         end
         else if EscapeChar = 'x' then //hex char
         begin
-          if I < (Length(Line) - 3) then
+          if Loc < (Length(Line) - 3) then
           begin
             CodeLength := 5;
-            NewChars := GetHexCode(Copy(Line, I+1, I+3));
+            NewChars := GetHexCode(Copy(Line, Loc+1, Loc+3));
           end;
         end
         else
         begin
-          NewChars := GetCharCode(Line[I + 1]);
+          NewChars := GetCharCode(Line[Loc + 1]);
         end;
 
-        Line := Copy(Line, 1, I - 1) + NewChars + Copy(Line, I + CodeLength, MaxInt); 
+        Line := Copy(Line, 1, Loc - 1) + NewChars
+                + Copy(Line, Loc + CodeLength, MaxInt);
 
       end;
     finally
