@@ -42,6 +42,10 @@ unit Transpiler;
     begin
       Result := #10; //newline
     end;
+    else if CurrentToken.LexemeType = TSemiColon then
+    begin
+      Result := #10; //newline
+    end;
   end;
 
   procedure Transpile(Tokens: TTokenArray; InputFilePath: string; OutputFolder: string);
