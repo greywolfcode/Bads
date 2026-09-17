@@ -40,19 +40,57 @@ unit Transpiler;
     end
     else
     begin
-      Inc(Data.CurrenToken);
       Result := 'exit /b ' + Data[Data.CurrentToken].Lexeme + ' ';
+      Inc(Data.CurrenToken);
     end;
   end;
   function ProcessExport(var Data: TranspilerData): string
   begin
-    Inc(Data.CurrentToken)
     Result := 'set ' + Data.Tokens[Data.CurrentToken] + ' ';
+    Inc(Data.CurrentToken)
   end;
   function ProcessRead(var Data: TranspilerData): string
   begin
-    Inc(Data.CurrentToken)
     Result := 'set /p ' + Data.Tokens[Data.CurrentToken] + ' ';
+    Inc(Data.CurrentToken)
+  end;
+  function ProcessVar(var Data: TranspilerData): string
+  begin
+    if (Data.Tokens[Data.CurrentToken].TokenType = TRightCurlyBracket then
+    begin
+      Inc(Data.CurrentToken);
+      Result := '%' + Data.Tokens[Data.CurrentTokens].Lexeme + '%'; //should be var name
+      Inc(Data.CurrentToken);
+      Inc(Data.CurrentToken); //bypass closing }
+    end
+    else if (Data.Tokens[Data.CurrentToken].TokenType = TWord then
+    begin
+      if Data.Tokens[Data.CurrentToken].Lexeme in [1..9] then
+      begin
+        Result := '%' + Data.Tokens[Data.CurrentToken].Lexeme + '% ';
+        Inc(Data.CurrentToken);
+      end
+      if Data.Tokens[Data.CurrentToken].Lexeme = '0' then
+      begin
+        Result := '%~0 ';
+        Inc(Data.CurrentToken);
+      end
+      if Data.Tokens[Data.CurrentToken].Lexeme = '?' then
+      begin
+        Result := '%ERRORLEVEL% ';
+        Inc(Data.CurrentToken);
+      end
+      if Data.Tokens[Data.CurrentToken].Lexeme = '$' then
+      begin
+        Result := '%RANDOM% '; //No PID on Win98/DOS
+        Inc(Data.CurrentToken);
+      end
+      else
+      begin
+        Result := '%' + Data.Tokens[Data.CurrentToken].Lexeme + ' ';
+        Inc(Data.CurrentToken);
+      end;
+    end
   end;
 
   function TranspileTokens(var Data: TranspilerData): string;
@@ -66,6 +104,7 @@ unit Transpiler;
     //Word based types: commands, etc.
     if CurrentToken.LexemeType = TWord then
     begin
+      //Builtin Commands
       if CurrentToken.Lexeme = 'clear' then
       begin
         Inc(Data.CurrentToken);
@@ -108,41 +147,4 @@ unit Transpiler;
       end;
 
     end
-    else if CurrentToken.LexemeType = TEOL then
-    begin
-      Result := #10; //newline
-    end;
-    else if CurrentToken.LexemeType = TSemiColon then
-    begin
-      Result := #10; //newline
-    end;
-  end;
-
-  procedure Transpile(Tokens: TTokenArray; InputFilePath: string; OutputFolder: string);
-  var
-    Data: TranspilerData;
-    FileName: string;
-    OutputPath: string;
-    OutputFile: TextFile;
-  begin
-    Data.Tokens := Tokens;
-    Data.CurrentToken := 0;
-
-    FileName := GetFileName(InputFilePath);
-    OutputPath := OutputFolder + FileName + '.bat';
-
-    AssignFile(OutputFile, OutputPath);
-    Rewrite(OutputFile);
-
-    try
-      while Data.CurrentToken < Length(Data.Tokens) do
-      begin
-        write(OutputFile, TranspileTokens(Data));
-      end;
-    finally
-      CloseFile(OutputFile);
-    end;
-
-  end;
-
-end.
+    else if CurrentT
