@@ -16,6 +16,34 @@ unit Transpiler;
       CurrentToken: Integer;
     end;
 
+  function TranspileTokens(var Data: TranspilerData): string;
+  var
+    CurrentToken: Token;
+  begin
+    Result := '';
+
+    CurrentToken := Data.Tokens[Data.CurrentToken];
+
+    //Word based types: commands, etc.
+    if CurrentToken.LexemeType = TWord then
+    begin
+      if CurrentToken.Lexeme = 'clear' then
+      begin
+        Inc(Data.CurrentToken);
+        Result := 'cls';
+      end
+      else if CurrentToken.Lexeme = 'pwd' then
+      begin
+        Inc(Data.CurrentToken);
+        Result := 'cd';
+      end;
+    end
+    else if CurrentToken.LexemeType = TEOL then
+    begin
+      Result := #10; //newline
+    end;
+  end;
+
   procedure Transpile(Tokens: TTokenArray; InputFilePath: string; OutputFolder: string);
   var
     Data: TranspilerData;
@@ -35,7 +63,7 @@ unit Transpiler;
     try
       while Data.CurrentToken < Length(Data.Tokens) do
       begin
-        Inc(Data.CurrentToken);
+        write(OutputFile, TranspileTokens(Data));
       end;
     finally
       CloseFile(OutputFile);
