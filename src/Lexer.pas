@@ -125,81 +125,81 @@ unit Lexer;
                AddToken(Output, Lexeme, LineNum, TWeakString);
              end;
       else
-        if IsAlphaNumeric(CurrentToken) then
+      begin
+        Lexeme := '';
+        while (Offset + 1 <= Length(Line))
+          and (not IsWhitespace(Line[Offset + 1])) do
         begin
-          Lexeme := '';
-          while (Offset + 1 <= Length(Line))
-                and (IsAlphaNumeric(Line[Offset + 1]))
-                or (Line[Offset + 1] = '_')
-                or (Line[Offset + 1] = '\')do
+          if Line[Offset + 1] = '\' then
           begin
-            if Line[Offset + 1] = '\' then
-            begin
-              Inc(Offset); //increment twice to get charachter after slash
-              Lexeme := Lexeme + Line[Offset + 2];
-            end
-            else
-            begin
-              Lexeme := Lexeme + Line[Offset + 1];
-            end;
-            Inc(Offset);
-          end;
-
-          Lexeme := Copy(Line, Start, Offset);
-          //check for keyword
-          if Lexeme = 'if' then
-          begin
-            AddToken(Output, 'if', LineNum, TIf);
-          end
-          else if Lexeme = 'then' then
-          begin
-            AddToken(Output, 'then', LineNum, TThen);
-          end
-          else if Lexeme = 'elif' then
-          begin
-            AddToken(Output, 'elif', LineNum, TElif);
-          end
-          else if Lexeme = 'else' then
-          begin
-            AddToken(Output, 'else', LineNum, TElse);
-          end
-          else if Lexeme = 'fi' then
-          begin
-            AddToken(Output, 'fi', LineNum, TFi);
-          end
-          else if Lexeme = 'while' then
-          begin
-            AddToken(Output, 'while', LineNum, TWhile);
-          end
-          else if Lexeme = 'until' then
-          begin
-            AddToken(Output, 'until', LineNum, TUntil);
-          end
-          else if Lexeme = 'do' then
-          begin
-            AddToken(Output, 'do', LineNum, TDo);
-          end
-          else if Lexeme = 'done' then
-          begin
-            AddToken(Output, 'done', LineNum, TDone);
-          end
-          else if Lexeme = 'for' then
-          begin
-            AddToken(Output, 'for', LineNum, TFor);
-          end
-          else if Lexeme = 'in' then
-          begin
-            AddToken(Output, 'in', LineNum, TIn);
+            Inc(Offset); //increment twice to get charachter after slash
+            Lexeme := Lexeme + Line[Offset + 2];
           end
           else
           begin
-            AddToken(Output, Lexeme, LineNum, TWord);
+            Lexeme := Lexeme + Line[Offset + 1];
           end;
-        end;    
-      end;
+          Inc(Offset);
+        end;
 
-      AddToken(Output, #10, LineNum, TEOL);
+        Lexeme := Copy(Line, Start, Offset);
+        //check for keyword
+        if Lexeme = 'if' then
+        begin
+          AddToken(Output, 'if', LineNum, TIf);
+        end
+        else if Lexeme = 'then' then
+        begin
+          AddToken(Output, 'then', LineNum, TThen);
+        end
+        else if Lexeme = 'elif' then
+        begin
+          AddToken(Output, 'elif', LineNum, TElif);
+        end
+        else if Lexeme = 'else' then
+        begin
+          AddToken(Output, 'else', LineNum, TElse);
+        end
+        else if Lexeme = 'fi' then
+        begin
+          AddToken(Output, 'fi', LineNum, TFi);
+        end
+        else if Lexeme = 'while' then
+        begin
+          AddToken(Output, 'while', LineNum, TWhile);
+        end
+        else if Lexeme = 'until' then
+        begin
+          AddToken(Output, 'until', LineNum, TUntil);
+        end
+        else if Lexeme = 'do' then
+        begin
+          AddToken(Output, 'do', LineNum, TDo);
+        end
+        else if Lexeme = 'done' then
+        begin
+          AddToken(Output, 'done', LineNum, TDone);
+        end
+        else if Lexeme = 'for' then
+        begin
+          AddToken(Output, 'for', LineNum, TFor);
+        end
+        else if Lexeme = 'in' then
+        begin
+          AddToken(Output, 'in', LineNum, TIn);
+        end
+        else
+        begin
+          AddToken(Output, Lexeme, LineNum, TWord);
+        end;
+      end;
+      //TODO: fix indenting
+      //Not sure what this is tied to, but
+      //it is requried for compilation
+      end;
     end;
+
+    AddToken(Output, #10, LineNum, TEOL);
   end;
 
   function ParseFile(Path: string): TTokenArray;
