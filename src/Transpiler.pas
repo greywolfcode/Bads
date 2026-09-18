@@ -144,8 +144,73 @@ unit Transpiler;
       Inc(Data.CurrentToken);
     end;
 
-    Result := 'set /p ' + Data.Tokens[Data.CurrentToken].Lexeme + ' ';
-    Inc(Data.CurrentToken)
+    if Data.Tokens[Data.CurrentToken].LexemeType = TWeakString then
+    begin
+      Output := Output + ProcessWeakString(Data, False);
+      Inc(Data.CurrentToken);
+
+      if Data.Tokens[Data.CurrentToken].Lexeme = '=' then
+      begin
+        Output := Output + '==';
+      end
+      else if Data.Tokens[Data.CurrentToken].Lexeme = '!=' then
+      begin
+        Output := 'NOT ' + Output + '==';
+      end
+      else if Data.Tokens[Data.CurrentToken].Lexeme = '-eq' then
+      begin
+        Output := Output + ' EQU ';
+      end
+      else if Data.Tokens[Data.CurrentToken].Lexeme = '-ne' then
+      begin
+        Output := Output + ' NEQ ';
+      end
+      else if Data.Tokens[Data.CurrentToken].Lexeme = '-lt' then
+      begin
+        Output := Output + ' LSS ';
+      end
+      else if Data.Tokens[Data.CurrentToken].Lexeme = '-le' then
+      begin
+        Output := Output + ' LEQ ';
+      end
+      else if Data.Tokens[Data.CurrentToken].Lexeme = '-gt' then
+      begin
+        Output := Output + ' GTR ';
+      end
+      else if Data.Tokens[Data.CurrentToken].Lexeme = '-ge' then
+      begin
+        Output := Output + ' GEQ ';
+      end
+    end
+    else if Data.Tokens[Data.CurrentToken].LexemeType = TWord then
+    begin
+      if Data.Tokens[Data.CurrentToken].Lexeme = '-z' then
+      begin
+        Inc(Data.CurrentToken);
+        Output := ProcessWeakString(Data, False) + '==""'
+      end
+      else if Data.Tokens[Data.CurrentToken].Lexeme = '-n' then
+      begin
+        Inc(Data.CurrentToken);
+        Output := 'Not ' + ProcessWeakString(Data, False) + '==""'
+      end
+      else if Data.Tokens[Data.CurrentToken].Lexeme = '-f' then
+      begin
+        Inc(Data.CurrentToken);
+        Output := 'EXIST '
+                  + FixPathSeperators(ProcessWeakString(Data, False))
+                  + '==""';
+      end
+      else if Data.Tokens[Data.CurrentToken].Lexeme = '-n' then
+      begin
+        Inc(Data.CurrentToken);
+        Output := 'EXIST '
+                  + FixPathSeperators(ProcessWeakString(Data, False))
+                  + '\' + '==""';
+      end
+    end;
+
+  Result := Output;  
   end;
 
   function TranspileTokens(var Data: TranspilerData): string;
