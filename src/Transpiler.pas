@@ -3,6 +3,7 @@ unit Transpiler;
   interface
 
   uses
+    StringUtils,
     PathUtils,
     TokenData;
 
@@ -16,6 +17,46 @@ unit Transpiler;
       CurrentToken: Integer;
     end;
 
+  function ProcessString(var Data: TranspilerData): string ;
+  var
+    Lexeme: string;
+  begin
+    Lexeme := Data.Tokens[Data.CurrentToken].Lexeme;
+    Result := Copy(Lexeme, 2, Length(Lexeme) - 1); //remove ' marks
+  end;
+  function ProcessWeakString(var Data: TranspilerData; StripQuotes: Boolean): string;
+  var
+    Lexeme: string;
+    Offset: Integer;
+    VarPos: Integer;
+  begin
+    Lexeme := Data.Tokens[Data.CurrentToken].Lexeme;
+
+    if StripQuotes then
+    begin
+      Lexeme := Copy(Lexeme, 2, Length(Lexeme) - 1); //remove " marks
+    end;
+    
+    //expand variables inside
+    VarPos := Pos('$', Lexeme);
+    while VarPos > 0 do
+    begin
+      Offset := VarPos + 1;
+
+      while (not Offset > Length(Lexeme))
+            and (not IsWhitespace(Lexeme[Offset + 1])) do
+      begin
+        Inc(Offset);
+      end;
+
+      Lexeme := Copy(Lexeme, 1, VarPos - 1) + '%'
+                + Copy(Lexeme, VarPos + 1, Offset - VarPos + 1)
+                + Copy(Lexeme, VarPos + 1 + Offset, MaxInt);
+
+      VarPos := Pos('$', Lexeme);
+    end;
+    
+  end;
   function ProcessEcho(var Data: TranspilerData): string;
   var
     Output: string;
@@ -32,7 +73,7 @@ unit Transpiler;
       Result := 'echo '; //What to output will be transpiled in main function
     end;
   end;
-  function ProcessExit(var Data: TranspilerData): string
+  function ProcessExit(var Data: TranspilerData): string;
   begin
     if (Data.CurrentToken = Length(Data.Tokens)) then
     begin
@@ -40,47 +81,47 @@ unit Transpiler;
     end
     else
     begin
-      Result := 'exit /b ' + Data[Data.CurrentToken].Lexeme + ' ';
-      Inc(Data.CurrenToken);
+      Result := 'exit /b ' + Data.Tokens[Data.CurrentToken].Lexeme + ' ';
+      Inc(Data.CurrentToken);
     end;
   end;
-  function ProcessExport(var Data: TranspilerData): string
+  function ProcessExport(var Data: TranspilerData): string;
   begin
-    Result := 'set ' + Data.Tokens[Data.CurrentToken] + ' ';
+    Result := 'set ' + Data.Tokens[Data.CurrentToken].Lexeme + ' ';
     Inc(Data.CurrentToken)
   end;
-  function ProcessRead(var Data: TranspilerData): string
+  function ProcessRead(var Data: TranspilerData): string;
   begin
-    Result := 'set /p ' + Data.Tokens[Data.CurrentToken] + ' ';
+    Result := 'set /p ' + Data.Tokens[Data.CurrentToken].Lexeme + ' ';
     Inc(Data.CurrentToken)
   end;
-  function ProcessVar(var Data: TranspilerData): string
+  function ProcessVar(var Data: TranspilerData): string;
   begin
-    if (Data.Tokens[Data.CurrentToken].TokenType = TRightCurlyBracket then
+    if Data.Tokens[Data.CurrentToken].LexemeType = TRightCurlyBracket then
     begin
       Inc(Data.CurrentToken);
-      Result := '%' + Data.Tokens[Data.CurrentTokens].Lexeme + '%'; //should be var name
+      Result := '%' + Data.Tokens[Data.CurrentToken].Lexeme + '%'; //should be var name
       Inc(Data.CurrentToken);
       Inc(Data.CurrentToken); //bypass closing }
     end
-    else if (Data.Tokens[Data.CurrentToken].TokenType = TWord then
+    else if Data.Tokens[Data.CurrentToken].LexemeType = TWord then
     begin
-      if Data.Tokens[Data.CurrentToken].Lexeme in [1..9] then
+      if Data.Tokens[Data.CurrentToken].Lexeme[1] in ['1'..'9'] then
       begin
         Result := '%' + Data.Tokens[Data.CurrentToken].Lexeme + '% ';
         Inc(Data.CurrentToken);
       end
-      if Data.Tokens[Data.CurrentToken].Lexeme = '0' then
+      else if Data.Tokens[Data.CurrentToken].Lexeme = '0' then
       begin
         Result := '%~0 ';
         Inc(Data.CurrentToken);
       end
-      if Data.Tokens[Data.CurrentToken].Lexeme = '?' then
+      else if Data.Tokens[Data.CurrentToken].Lexeme = '?' then
       begin
         Result := '%ERRORLEVEL% ';
         Inc(Data.CurrentToken);
       end
-      if Data.Tokens[Data.CurrentToken].Lexeme = '$' then
+      else if Data.Tokens[Data.CurrentToken].Lexeme = '$' then
       begin
         Result := '%RANDOM% '; //No PID on Win98/DOS
         Inc(Data.CurrentToken);
@@ -91,6 +132,20 @@ unit Transpiler;
         Inc(Data.CurrentToken);
       end;
     end
+  end;
+  function ProcessTest(var Data: TranspilerData): string;
+  var
+    Output: string;
+  begin
+    Output := '';
+
+    if Data.Tokens[Data.CurrentToken].LexemeType = TLeftSquareBracket then
+    begin
+      Inc(Data.CurrentToken);
+    end;
+
+    Result := 'set /p ' + Data.Tokens[Data.CurrentToken].Lexeme + ' ';
+    Inc(Data.CurrentToken)
   end;
 
   function TranspileTokens(var Data: TranspilerData): string;
