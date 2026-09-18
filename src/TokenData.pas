@@ -12,6 +12,8 @@ unit TokenData;
       TRightParen,
       TLeftCurlyBracket,
       TRightCurlyBracket,
+      TLeftSquareBracket,
+      TRightSquareBracket,
       TEOL,
 
       //Redirection

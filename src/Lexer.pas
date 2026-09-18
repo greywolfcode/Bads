@@ -46,6 +46,8 @@ unit Lexer;
         ';': AddToken(Output, ';', LineNum, TSemiColon);
         '(': AddToken(Output, '(', LineNum, TLeftParen);
         ')': AddToken(Output, ')', LineNum, TRightParen);
+        '[': AddToken(Output, '[', LineNum, TLeftSquareBracket);
+        ']': AddToken(Output, ']', LineNum, TRightSquareBracket);
         '{': AddToken(Output, '{', LineNum, TLeftCurlyBracket);
         '}': AddToken(Output, '}', LineNum, TRightCurlyBracket);
         '|': begin
@@ -127,6 +129,4 @@ unit Lexer;
       else
       begin
         Lexeme := '';
-        while (Offset + 1 <= Length(Line))
-          and (not IsWhitespace(Line[Offset + 1]))
-          and (not Line[Offset + 1] in ['|', '<', '>', '&', '"', #39])
+        while (Offset + 1 <= Leng
