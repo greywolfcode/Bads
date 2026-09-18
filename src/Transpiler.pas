@@ -147,4 +147,63 @@ unit Transpiler;
       end;
 
     end
-    else if CurrentT
+    else if CurrentToken.LexemeType = TDollar then
+    begin
+      Result := ProcessVar(Data);
+    end
+    else if CurrentToken.LexemeType = TLeftSquareBracket then
+    begin
+      Result := ProcessTest(Data);
+    end
+
+    //strings
+    else if CurrentToken.LexemeType = TString then
+    begin
+      Result := ProcessString(Data);
+    end
+    else if CurrentToken.LexemeType = TWeakString then
+    begin
+      Result := ProcessWeakString(Data, False);
+    end
+
+    //newline charachters
+    else if CurrentToken.LexemeType = TEOL then
+    begin
+      Inc(Data.CurrentToken);
+      Result := #10; //newline
+    end
+    else if CurrentToken.LexemeType = TSemiColon then
+    begin
+      Inc(Data.CurrentToken);
+      Result := #10; //newline
+    end;
+  end;
+
+  procedure Transpile(Tokens: TTokenArray; InputFilePath: string; OutputFolder: string);
+  var
+    Data: TranspilerData;
+    FileName: string;
+    OutputPath: string;
+    OutputFile: TextFile;
+  begin
+    Data.Tokens := Tokens;
+    Data.CurrentToken := 0;
+
+    FileName := GetFileName(InputFilePath);
+    OutputPath := OutputFolder + FileName + '.bat';
+
+    AssignFile(OutputFile, OutputPath);
+    Rewrite(OutputFile);
+
+    try
+      while Data.CurrentToken < Length(Data.Tokens) do
+      begin
+        write(OutputFile, TranspileTokens(Data));
+      end;
+    finally
+      CloseFile(OutputFile);
+    end;
+
+  end;
+
+end.
